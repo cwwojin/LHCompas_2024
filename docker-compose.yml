@@ -1,0 +1,13 @@
+services:
+  trainer:
+    container_name: trainer
+    platform: linux/amd64
+    env_file: .env
+    build:
+      dockerfile: ./Dockerfile
+      target: train
+    image: woojin_trainer
+    # pull_policy: build
+    restart: unless-stopped
+    profiles:
+      - train
