@@ -5,7 +5,7 @@ services:
     env_file: .env
     build:
       dockerfile: ./Dockerfile
-      target: train
+      target: base
     image: woojin_trainer
     # pull_policy: build
     restart: unless-stopped
