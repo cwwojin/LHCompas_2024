@@ -2,7 +2,7 @@ services:
   trainer:
     container_name: trainer
     platform: linux/amd64
-    env_file: .env
+    # env_file: .env
     build:
       dockerfile: ./Dockerfile
       target: base

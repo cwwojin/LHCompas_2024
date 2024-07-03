@@ -1,13 +1,20 @@
 [tool.poetry]
 name = "compas"
 version = "0.1.0"
-description = "LH Compas 2024 Competition - Time-Series Forecasting for Commercial Vacancy Rates"
-authors = ["Woojin Choi <cwwojin@gmail.com>"]
+description = ""
+authors = ["cwwojin <cwwojin@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+tsai = "^0.3.9"
+yacs = "^0.1.8"
+numpy = "<2"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+pylint = "^3.2.5"
 
 [build-system]
 requires = ["poetry-core"]
