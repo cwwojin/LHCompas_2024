@@ -39,4 +39,24 @@ class PatchTST(Model):
             res_attention=cfg.RES_ATTENTION,  # flag to indicate if Residual MultiheadAttention should be used
             store_attn=cfg.STORE_ATTN,  # can be used to visualize attention weights
         )
-        self.config = cfg
+        self.config = cfg  # save configuration
+
+    def forward(self, x):
+        """
+        Forward Model
+
+        Parameters
+        ---
+        x: Tensor
+            rank 3 tensor with shape [batch size x features x sequence length]
+        """
+        return super().forward(x)
+
+    def predict(self, x):
+        """
+        Prediction
+
+        Parameters
+        ---
+        """
+        pass

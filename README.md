@@ -16,18 +16,22 @@ This is the installation guide.
 
 ### 2.1. Prerequisites
 
+This project depends on the following repositories.
+
+https://github.com/timeseriesAI/tsai
+
 ## 3. Contribution
 
 ### 3.1. Branch Naming
 
-- feature/{$feature_branch_name}
-- hotfix/{$hotfix_branch_name}
-- release/{$release_ver}
+-   feature/{$feature_branch_name}
+-   hotfix/{$hotfix_branch_name}
+-   release/{$release_ver}
 
 ### 3.2. Using Templates
 
-- Run this to set the commit message template.
-  
+-   Run this to set the commit message template.
+
 ```shell
 $ git config commit.template .gitmessage.txt
 ```
@@ -38,4 +42,4 @@ $ git config commit.template .gitmessage.txt
 
 ## Author
 
-- Woojin Choi <cwwojin@gmail.com> <br/>
+-   Woojin Choi <cwwojin@gmail.com> <br/>

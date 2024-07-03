@@ -1,4 +1,5 @@
 MODEL:
+  DEVICE: "cuda"
   C_IN: 1
   C_OUT: 1
   SEQ_LEN: 1
