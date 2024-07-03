@@ -1,0 +1,5 @@
+MODEL:
+  C_IN: 1
+  C_OUT: 1
+  SEQ_LEN: 1
+  PRED_DIM: 1

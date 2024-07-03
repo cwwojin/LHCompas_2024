@@ -9,7 +9,7 @@ _C = CN()
 
 _C.MODEL = CN()
 _C.MODEL.DEVICE = "cuda"
-# model dimensions
+# mandatory parameters : model dimensions
 _C.MODEL.C_IN = None
 _C.MODEL.C_OUT = None
 _C.MODEL.SEQ_LEN = None
