@@ -171,3 +171,4 @@ mlruns/
 data/
 *tmp*
 *.pt
+notebooks/*/
