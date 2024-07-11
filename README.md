@@ -1,10 +1,10 @@
 # LHCompas_2024
 
-- [LHCompas\_2024](#lhcompas_2024)
-  - [1. Introduction](#1-introduction)
-  - [2. Getting Started](#2-getting-started)
-  - [3. Contribution](#3-contribution)
-  - [Author](#author)
+-   [LHCompas_2024](#lhcompas_2024)
+    -   [1. Introduction](#1-introduction)
+    -   [2. Getting Started](#2-getting-started)
+    -   [3. Contribution](#3-contribution)
+    -   [Author](#author)
 
 ## 1. Introduction
 
@@ -14,11 +14,12 @@ This repository contains trainers for models for : **Time-Series Forecasting for
 
 This is the installation guide.
 
-### 2.1. Prerequisites
+### 2.1. Install with pip
 
-This project depends on the following repositories.
-
-https://github.com/timeseriesAI/tsai
+```shell
+$ cd compas
+$ pip install -e .
+```
 
 ## 3. Contribution
 
