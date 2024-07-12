@@ -47,6 +47,7 @@ class TSMultiDataset(Dataset):
         x_cols,
         input_steps,
         output_steps,
+        scaler=None,
     ):
 
         # data : list of dataframe or single dataframe (all same shape / time series length)
@@ -58,9 +59,12 @@ class TSMultiDataset(Dataset):
             self.df_list[0].shape[0] - self.input_steps - self.output_steps + 1
         )  # length of each series
 
-        # setup scaler & data
-        self.scaler = StandardScaler()
-        self.scaler.fit(self.df_combined[x_cols])
+        # setup scaler
+        if scaler is not None:
+            self.scaler = scaler
+        else:
+            self.scaler = StandardScaler()
+            self.scaler.fit(self.df_combined[x_cols])
 
         # dim : (N_series, N_timesteps, N_features)
         self.data = torch.tensor(

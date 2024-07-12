@@ -134,12 +134,14 @@ class TSMultiDataModule(pl.LightningDataModule):
             x_cols=self.x_cols,
             input_steps=self.input_steps,
             output_steps=self.output_steps,
+            scaler=self.scaler,
         )
         self.test = TSMultiDataset(
             tests,
             x_cols=self.x_cols,
             input_steps=self.input_steps,
             output_steps=self.output_steps,
+            scaler=self.scaler,
         )
 
     def train_dataloader(self):
