@@ -19,12 +19,10 @@ class LSTMSimpleLightningModule(pl.LightningModule):
             assert scaler is not None, "Dataset Scaler must be provided with CfgNode"
             self.model = LSTMSimple(
                 input_size=cfg["input_size"],
-                output_size=cfg["output_size"],
+                output_steps=cfg["output_steps"],
                 hidden_size=cfg["hidden_size"],
                 num_layers=cfg["num_layers"],
-                bidirectional=(
-                    cfg["LSTM_bidirectional"] if "LSTM_bidirectional" in cfg else False
-                ),
+                bidirectional=cfg["bidirectional"] if "bidirectional" in cfg else False,
                 scaler=scaler,
             )
 
@@ -45,7 +43,6 @@ class LSTMSimpleLightningModule(pl.LightningModule):
                 "train_mse_loss": loss,
             },
             on_epoch=True,
-            # on_step=False,
         )
         return {"loss": loss}
 
@@ -78,12 +75,15 @@ class LSTMSimpleLightningModule(pl.LightningModule):
         )
         return {"loss": loss}
 
-    def on_test_epoch_end(self):
-        preds = [x[0] for x in self.test_predictions]
-        gt = [x[1] for x in self.test_predictions]
-        print(len(preds), len(gt))
-        print(preds[0].shape, gt[0].shape)
-        return None
+    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+        x, _ = batch
+        y_hat = self(x)
+
+        # Reshape y_hat as time series (B, output_steps, input_size)
+        batch_size = x.size(0)
+        preds = y_hat.view(batch_size, self.model.output_steps, self.model.input_size)
+
+        return preds
 
     def configure_optimizers(self):
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
