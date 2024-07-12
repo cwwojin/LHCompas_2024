@@ -1,10 +1,10 @@
 # LHCompas_2024
 
--   [LHCompas_2024](#lhcompas_2024)
-    -   [1. Introduction](#1-introduction)
-    -   [2. Getting Started](#2-getting-started)
-    -   [3. Contribution](#3-contribution)
-    -   [Author](#author)
+- [LHCompas\_2024](#lhcompas_2024)
+  - [1. Introduction](#1-introduction)
+  - [2. Getting Started](#2-getting-started)
+  - [3. Contribution](#3-contribution)
+  - [Author](#author)
 
 ## 1. Introduction
 
@@ -19,6 +19,12 @@ This is the installation guide.
 ```shell
 $ cd compas
 $ pip install -e .
+```
+
+### 2.2. Run an Experiment
+
+```shell
+$ python compas/experiments/run_LSTM.py --config="compas/experiments/config/train_example.yaml"
 ```
 
 ## 3. Contribution
