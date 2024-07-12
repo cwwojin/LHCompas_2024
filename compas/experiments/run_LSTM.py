@@ -46,6 +46,7 @@ def main():
     data_module.setup()
 
     # Prepare model
+    NO_VAL = cfg.VAL_SIZE <= 0
     model = LSTMSimpleLightningModule(
         cfg=dict(
             input_size=data_module.n_features,
@@ -55,6 +56,7 @@ def main():
             bidirectional=cfg.LSTM.BIDIRECTIONAL,
         ),
         scaler=data_module.scaler,
+        no_val=NO_VAL,
     )
 
     # Setup Trainer & MLFlow Logger
@@ -73,6 +75,9 @@ def main():
         ),
         check_val_every_n_epoch=1,
         default_root_dir=".logs/",
+        # skip validation if VAL_SIZE == 0
+        limit_val_batches=0 if NO_VAL else None,
+        num_sanity_val_steps=0 if NO_VAL else None,
     )
 
     # Train
@@ -88,7 +93,7 @@ def main():
     )
 
     # Export to TorchScript
-    model_name = f"LSTM_{'uni' if model.model.bidirectional else 'bi'}_in_{data_module.input_steps}_out_{data_module.output_steps}_{timestamp}"
+    model_name = f"LSTM_{'bi' if model.model.bidirectional else 'uni'}_in_{data_module.input_steps}_out_{data_module.output_steps}_train_{len(data_module.train)}_val_{len(data_module.val)}_{timestamp}"
     scripted_model = torch.jit.script(model.model)
     if not path.isdir(".saved_models"):
         os.makedirs(".saved_models", exist_ok=True)

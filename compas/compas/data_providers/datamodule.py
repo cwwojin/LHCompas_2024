@@ -47,19 +47,28 @@ class TSSingleDataModule(pl.LightningDataModule):
             test_size=self.test_size,
             shuffle=False,
         )
-        train, val = train_test_split(train, test_size=self.test_size, shuffle=False)
+
+        if self.val_size:
+            train, val = train_test_split(train, test_size=self.val_size, shuffle=False)
+
         # scaler is set from train-set only
         self.train = TSSingleDataset(
             train, self.x_cols, self.input_steps, self.output_steps
         )
         self.scaler = self.train.scaler
         self.n_features = self.train.n_features
-        self.validation = TSSingleDataset(
-            val, self.x_cols, self.input_steps, self.output_steps, scaler=self.scaler
-        )
         self.test = TSSingleDataset(
             test, self.x_cols, self.input_steps, self.output_steps, scaler=self.scaler
         )
+
+        if self.val_size:
+            self.validation = TSSingleDataset(
+                val,
+                self.x_cols,
+                self.input_steps,
+                self.output_steps,
+                scaler=self.scaler,
+            )
 
     def train_dataloader(self):
         return DataLoader(self.train, batch_size=self.batch_size, shuffle=True)
@@ -114,11 +123,15 @@ class TSMultiDataModule(pl.LightningDataModule):
             for df in self.df_list
         ]
         trains_t, tests = [x[0] for x in splits], [x[1] for x in splits]
-        splits = [
-            train_test_split(df, test_size=self.val_size, shuffle=False)
-            for df in trains_t
-        ]
-        trains, vals = [x[0] for x in splits], [x[1] for x in splits]
+
+        if self.val_size:
+            splits = [
+                train_test_split(df, test_size=self.val_size, shuffle=False)
+                for df in trains_t
+            ]
+            trains, vals = [x[0] for x in splits], [x[1] for x in splits]
+        else:
+            trains = trains_t
 
         # scaler is set from train-set only
         self.train = TSMultiDataset(
@@ -129,13 +142,6 @@ class TSMultiDataModule(pl.LightningDataModule):
         )
         self.scaler = self.train.scaler
         self.n_features = self.train.n_features
-        self.validation = TSMultiDataset(
-            vals,
-            x_cols=self.x_cols,
-            input_steps=self.input_steps,
-            output_steps=self.output_steps,
-            scaler=self.scaler,
-        )
         self.test = TSMultiDataset(
             tests,
             x_cols=self.x_cols,
@@ -143,6 +149,15 @@ class TSMultiDataModule(pl.LightningDataModule):
             output_steps=self.output_steps,
             scaler=self.scaler,
         )
+
+        if self.val_size:
+            self.validation = TSMultiDataset(
+                vals,
+                x_cols=self.x_cols,
+                input_steps=self.input_steps,
+                output_steps=self.output_steps,
+                scaler=self.scaler,
+            )
 
     def train_dataloader(self):
         return DataLoader(self.train, batch_size=self.batch_size, shuffle=True)

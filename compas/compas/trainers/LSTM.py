@@ -8,7 +8,7 @@ from compas.models import LSTMSimple
 
 # Lightning module
 class LSTMSimpleLightningModule(pl.LightningModule):
-    def __init__(self, model=None, cfg=None, scaler=None):
+    def __init__(self, model=None, cfg=None, scaler=None, no_val=False):
         super(LSTMSimpleLightningModule, self).__init__()
         assert (model is not None) or (cfg is not None)
 
@@ -29,6 +29,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
         self.scaler = self.model.scaler
         self.criterion = nn.MSELoss()
         self.test_predictions = []
+        self.no_val = no_val
 
     def forward(self, x):
         return self.model(x)
@@ -86,14 +87,14 @@ class LSTMSimpleLightningModule(pl.LightningModule):
         return preds
 
     def configure_optimizers(self):
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=1e-3)
         self.scheduler = {
             "scheduler": torch.optim.lr_scheduler.ReduceLROnPlateau(
                 self.optimizer,
                 mode="min",
                 patience=2,
-                min_lr=1e-5,
+                min_lr=1e-6,
             ),
-            "monitor": "val_mse_loss",
+            "monitor": "train_mse_loss" if self.no_val else "val_mse_loss",
         }
         return {"optimizer": self.optimizer, "lr_scheduler": self.scheduler}
