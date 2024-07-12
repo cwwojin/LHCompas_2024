@@ -164,6 +164,8 @@ cython_debug/
 # Machine Learning
 lightning_logs/
 mlruns/
+.logs/
+.saved_models/
 
 # Extras
 .DS_Store

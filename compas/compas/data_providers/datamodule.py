@@ -14,6 +14,9 @@ class TSSingleDataModule(pl.LightningDataModule):
         emd_cd: str,
         input_steps: int,
         output_steps: int,
+        test_size: int = 12,
+        val_size: int = 12,
+        batch_size: int = 8,
         x_cols: list = None,
     ) -> None:
         super().__init__()
@@ -22,6 +25,9 @@ class TSSingleDataModule(pl.LightningDataModule):
         self.output_steps = output_steps
         self.emd_cd = emd_cd
         self.x_cols = x_cols
+        self.test_size = test_size
+        self.val_size = val_size
+        self.batch_size = batch_size
 
     def prepare_data(self) -> None:
         df = pd.read_csv(self.data_path, low_memory=False)
@@ -35,13 +41,13 @@ class TSSingleDataModule(pl.LightningDataModule):
             self.x_cols.insert(0, self.x_cols.pop(self.x_cols.index("vacancy_rate")))
 
     def setup(self, stage: str = None) -> None:
-        # (train, val, test) -> (0.6, 0.2, 0.2)
+        # (train, val, test) -> (ANY, 12, 12)
         train, test = train_test_split(
             self.dataframe,
-            test_size=0.2,
+            test_size=self.test_size,
             shuffle=False,
         )
-        train, val = train_test_split(train, test_size=0.25, shuffle=False)
+        train, val = train_test_split(train, test_size=self.test_size, shuffle=False)
         # scaler is set from train-set only
         self.train = TSSingleDataset(
             train, self.x_cols, self.input_steps, self.output_steps
@@ -55,26 +61,36 @@ class TSSingleDataModule(pl.LightningDataModule):
             test, self.x_cols, self.input_steps, self.output_steps, scaler=self.scaler
         )
 
-    def train_dataloader(self, batch_size: int = 8):
-        return DataLoader(self.train, batch_size=batch_size, shuffle=True)
+    def train_dataloader(self):
+        return DataLoader(self.train, batch_size=self.batch_size, shuffle=True)
 
-    def val_dataloader(self, batch_size: int = 8):
-        return DataLoader(self.validation, batch_size=batch_size, shuffle=False)
+    def val_dataloader(self):
+        return DataLoader(self.validation, batch_size=self.batch_size, shuffle=False)
 
-    def test_dataloader(self, batch_size: int = 8):
-        return DataLoader(self.test, batch_size=batch_size, shuffle=False)
+    def test_dataloader(self):
+        return DataLoader(self.test, batch_size=self.batch_size, shuffle=False)
 
 
 # DataModule - Multi Series
 class TSMultiDataModule(pl.LightningDataModule):
     def __init__(
-        self, data_path: str, input_steps: int, output_steps: int, x_cols: list = None
+        self,
+        data_path: str,
+        input_steps: int,
+        output_steps: int,
+        test_size: int = 12,
+        val_size: int = 12,
+        batch_size: int = 8,
+        x_cols: list = None,
     ) -> None:
         super().__init__()
         self.data_path = data_path
         self.input_steps = input_steps
         self.output_steps = output_steps
         self.x_cols = x_cols
+        self.test_size = test_size
+        self.val_size = val_size
+        self.batch_size = batch_size
 
     def prepare_data(self) -> None:
         df = pd.read_csv(self.data_path, low_memory=False)
@@ -92,13 +108,15 @@ class TSMultiDataModule(pl.LightningDataModule):
             self.x_cols.insert(0, self.x_cols.pop(self.x_cols.index("vacancy_rate")))
 
     def setup(self, stage: str = None) -> None:
-        # (train, val, test) -> (0.6, 0.2, 0.2)
+        # (train, val, test) -> (ANY, 12, 12)
         splits = [
-            train_test_split(df, test_size=0.2, shuffle=False) for df in self.df_list
+            train_test_split(df, test_size=self.test_size, shuffle=False)
+            for df in self.df_list
         ]
         trains_t, tests = [x[0] for x in splits], [x[1] for x in splits]
         splits = [
-            train_test_split(df, test_size=0.25, shuffle=False) for df in trains_t
+            train_test_split(df, test_size=self.val_size, shuffle=False)
+            for df in trains_t
         ]
         trains, vals = [x[0] for x in splits], [x[1] for x in splits]
 
@@ -124,11 +142,11 @@ class TSMultiDataModule(pl.LightningDataModule):
             output_steps=self.output_steps,
         )
 
-    def train_dataloader(self, batch_size: int = 8):
-        return DataLoader(self.train, batch_size=batch_size, shuffle=True)
+    def train_dataloader(self):
+        return DataLoader(self.train, batch_size=self.batch_size, shuffle=True)
 
-    def val_dataloader(self, batch_size: int = 8):
-        return DataLoader(self.validation, batch_size=batch_size, shuffle=False)
+    def val_dataloader(self):
+        return DataLoader(self.validation, batch_size=self.batch_size, shuffle=False)
 
-    def test_dataloader(self, batch_size: int = 8):
-        return DataLoader(self.test, batch_size=batch_size, shuffle=False)
+    def test_dataloader(self):
+        return DataLoader(self.test, batch_size=self.batch_size, shuffle=False)
