@@ -3,11 +3,11 @@ DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
 INPUT_STEPS: 3
 OUTPUT_STEPS: 1
 TEST_SIZE: 12
-VAL_SIZE: 12
+VAL_SIZE: 6
 LSTM:
-    NUM_LAYERS: 1
-    HIDDEN_SIZE: 32
-    BIDIRECTIONAL: False
+    NUM_LAYERS: 2
+    HIDDEN_SIZE: 64
+    BIDIRECTIONAL: True
 N_EPOCHS: 50
 BATCH_SIZE: 8
 MLFLOW_TRACKING_URI: "databricks"

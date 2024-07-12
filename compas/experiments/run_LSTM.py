@@ -1,8 +1,10 @@
 import os
 import os.path as path
+import pickle
 import torch
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import MLFlowLogger
+from pytorch_lightning.callbacks import LearningRateMonitor
 import mlflow
 from datetime import datetime
 from argparse import ArgumentParser
@@ -25,7 +27,7 @@ def get_args():
     return parser.parse_args()
 
 
-def main():
+def runExp_LSTM():
     args = get_args()
 
     # load config from .yaml file
@@ -46,15 +48,18 @@ def main():
     data_module.setup()
 
     # Prepare model
+    NO_VAL = cfg.VAL_SIZE <= 0
     model = LSTMSimpleLightningModule(
         cfg=dict(
             input_size=data_module.n_features,
+            input_steps=cfg.INPUT_STEPS,
             output_steps=cfg.OUTPUT_STEPS,
             num_layers=cfg.LSTM.NUM_LAYERS,
             hidden_size=cfg.LSTM.HIDDEN_SIZE,
             bidirectional=cfg.LSTM.BIDIRECTIONAL,
         ),
         scaler=data_module.scaler,
+        no_val=NO_VAL,
     )
 
     # Setup Trainer & MLFlow Logger
@@ -73,6 +78,12 @@ def main():
         ),
         check_val_every_n_epoch=1,
         default_root_dir=".logs/",
+        callbacks=[
+            LearningRateMonitor(logging_interval="epoch"),
+        ],
+        # skip validation if VAL_SIZE == 0
+        limit_val_batches=0 if NO_VAL else None,
+        num_sanity_val_steps=0 if NO_VAL else None,
     )
 
     # Train
@@ -88,18 +99,23 @@ def main():
     )
 
     # Export to TorchScript
-    model_name = f"LSTM_{'uni' if model.model.bidirectional else 'bi'}_in_{data_module.input_steps}_out_{data_module.output_steps}_{timestamp}"
+    model_name = f"LSTM_{'bi' if model.model.bidirectional else 'uni'}_in_{data_module.input_steps}_out_{data_module.output_steps}_train_{len(data_module.train)}_val_{cfg.VAL_SIZE}_{timestamp}"
     scripted_model = torch.jit.script(model.model)
-    if not path.isdir(".saved_models"):
-        os.makedirs(".saved_models", exist_ok=True)
+    export_path = f".saved_models/{model_name}"
+    if not path.isdir(export_path):
+        os.makedirs(export_path, exist_ok=True)
     torch.jit.save(
         scripted_model,
-        f".saved_models/{model_name}.pt",
+        f"{export_path}/model.pt",
     )
+
+    # Export data scaler as pickle
+    with open(f"{export_path}/scaler.pkl", "wb") as f:
+        pickle.dump(model.scaler, f)
 
     # END
     print("Experiment Done Successfully.")
 
 
 if __name__ == "__main__":
-    main()
+    runExp_LSTM()
