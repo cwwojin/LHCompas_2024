@@ -22,6 +22,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
             assert scaler is not None, "Dataset Scaler must be provided with CfgNode"
             self.model = LSTMSimple(
                 input_size=cfg["input_size"],
+                input_steps=cfg["input_steps"],
                 output_steps=cfg["output_steps"],
                 hidden_size=cfg["hidden_size"],
                 num_layers=cfg["num_layers"],
@@ -40,6 +41,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
     def on_train_start(self):
         params = dict(
             input_size=self.model.input_size,
+            input_steps=self.model.input_steps,
             output_steps=self.model.output_steps,
             output_size=self.model.output_size,
             num_layers=self.model.num_layers,

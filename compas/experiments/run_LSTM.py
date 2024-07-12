@@ -52,6 +52,7 @@ def runExp_LSTM():
     model = LSTMSimpleLightningModule(
         cfg=dict(
             input_size=data_module.n_features,
+            input_steps=cfg.INPUT_STEPS,
             output_steps=cfg.OUTPUT_STEPS,
             num_layers=cfg.LSTM.NUM_LAYERS,
             hidden_size=cfg.LSTM.HIDDEN_SIZE,
