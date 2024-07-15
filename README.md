@@ -1,10 +1,11 @@
 # LHCompas_2024
 
-- [LHCompas\_2024](#lhcompas_2024)
-  - [1. Introduction](#1-introduction)
-  - [2. Getting Started](#2-getting-started)
-  - [3. Contribution](#3-contribution)
-  - [Author](#author)
+-   [LHCompas_2024](#lhcompas_2024)
+    -   [1. Introduction](#1-introduction)
+    -   [2. Getting Started](#2-getting-started)
+    -   [3. Contribution](#3-contribution)
+    -   [4. References](#4-references)
+    -   [Author](#author)
 
 ## 1. Introduction
 
@@ -17,15 +18,18 @@ This is the installation guide.
 ### 2.1. Install with pip
 
 ```shell
-$ cd compas
-$ pip install -e .
+$ pip install -e compas/
 ```
+
+Testing done using conda environment.
 
 ### 2.2. Run an Experiment
 
 ```shell
-$ python compas/experiments/run_LSTM.py --config="compas/experiments/config/train_example.yaml"
+$ python compas/experiments/run_LSTM.py --config="compas/experiments/config/lstm.yaml"
 ```
+
+To run your own experiments, edit the `.yaml` file and pass as argument.
 
 ## 3. Contribution
 
@@ -44,6 +48,12 @@ $ git config commit.template .gitmessage.txt
 ```
 
 ### 3.3.
+
+---
+
+## 4. References
+
+1. **DLinear(Zeng et al., 2022)** model implementation from : [cure-lab/LTSF-Linear](https://github.com/cure-lab/LTSF-Linear)
 
 ---
 
