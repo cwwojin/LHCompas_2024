@@ -26,6 +26,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
                 output_steps=cfg["output_steps"],
                 hidden_size=cfg["hidden_size"],
                 num_layers=cfg["num_layers"],
+                dropout=cfg["dropout"],
                 bidirectional=cfg["bidirectional"] if "bidirectional" in cfg else False,
                 scaler=scaler,
             )
@@ -46,6 +47,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
             output_size=self.model.output_size,
             num_layers=self.model.num_layers,
             hidden_size=self.model.hidden_size,
+            dropout=self.model.dropout,
             bidirectional=self.model.bidirectional,
             criterion="mse",
             use_validation=not self.no_val,
@@ -128,6 +130,6 @@ class LSTMSimpleLightningModule(pl.LightningModule):
                 patience=2,
                 min_lr=1e-6,
             ),
-            "monitor": "train_mse_loss" if self.no_val else "val_mse_loss",
+            "monitor": "train_mse_loss_epoch" if self.no_val else "val_mse_loss",
         }
         return {"optimizer": self.optimizer, "lr_scheduler": self.scheduler}

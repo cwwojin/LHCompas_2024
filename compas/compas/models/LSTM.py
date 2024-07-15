@@ -11,6 +11,7 @@ class LSTMSimple(nn.Module):
         num_layers,
         input_steps,
         output_steps,
+        dropout=0,
         bidirectional=False,
         scaler=None,
     ):
@@ -21,13 +22,14 @@ class LSTMSimple(nn.Module):
         self.output_size = output_steps * input_size  # input_size == N_FEATURES
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.dropout = dropout
         self.bidirectional = bidirectional
         self.scaler = scaler
         self.lstm = nn.LSTM(
             input_size,
             hidden_size,
             num_layers=num_layers,
-            dropout=0,
+            dropout=dropout,
             bidirectional=bidirectional,
             batch_first=True,
         )
