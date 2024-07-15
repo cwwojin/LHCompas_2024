@@ -1,5 +1,5 @@
 MODEL_TYPE: lstm
-DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
+DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv"
 INPUT_STEPS: 24
 OUTPUT_STEPS: 1
 OUTPUT_SIZE: 1
