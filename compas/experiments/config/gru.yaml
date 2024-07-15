@@ -1,4 +1,4 @@
-MODEL_TYPE: lstm
+MODEL_TYPE: gru
 DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
 INPUT_STEPS: 3
 OUTPUT_STEPS: 1
