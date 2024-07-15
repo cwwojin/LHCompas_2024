@@ -1,12 +1,12 @@
 MODEL_TYPE: lstm
 DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
-INPUT_STEPS: 6
+INPUT_STEPS: 3
 OUTPUT_STEPS: 1
-TEST_SIZE: 12
-VAL_SIZE: 0
+TEST_SIZE: 6
+VAL_SIZE: 6
 DLINEAR:
     KERNEL_SIZE: 25
-    INDIVIDUAL: False
+    INDIVIDUAL: True
 N_EPOCHS: 20
 BATCH_SIZE: 8
 MLFLOW_TRACKING_URI: "databricks"
