@@ -1,0 +1,18 @@
+MODEL_TYPE: cnn
+DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
+INPUT_STEPS: 3
+OUTPUT_STEPS: 1
+TEST_SIZE: 6
+VAL_SIZE: 6
+LSTM:
+    NUM_LAYERS: 2
+    HIDDEN_SIZE: 64
+    DROPOUT: 0.0
+    BIDIRECTIONAL: True
+N_EPOCHS: 50
+BATCH_SIZE: 8
+MLFLOW_TRACKING_URI: "databricks"
+DATABRICKS_WORKSPACE: "/Users/jjdg148@gmail.com"
+EXPERIMENT_NAME: "Compas_CNN"
+
+#/Users/leeseungjun/miniconda3/envs/venv/bin/python /Users/leeseungjun/Desktop/projects/LHCompas_2024/compas/experiments/run_cnn.py --config /Users/leeseungjun/Desktop/projects/LHCompas_2024/compas/experiments/config/cnn.yaml
