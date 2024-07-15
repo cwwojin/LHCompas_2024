@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 
-# Simple LSTM model
-class LSTMSimple(nn.Module):
+# Simple GRU model
+class GRUSimple(nn.Module):
     def __init__(
         self,
         input_size,
@@ -15,7 +15,7 @@ class LSTMSimple(nn.Module):
         bidirectional=False,
         scaler=None,
     ):
-        super(LSTMSimple, self).__init__()
+        super(GRUSimple, self).__init__()
         self.input_size = input_size
         self.input_steps = input_steps
         self.output_steps = output_steps
@@ -25,9 +25,9 @@ class LSTMSimple(nn.Module):
         self.dropout = dropout
         self.bidirectional = bidirectional
         self.scaler = scaler
-        self.lstm = nn.LSTM(
-            input_size,
-            hidden_size,
+        self.gru = nn.GRU(
+            input_size=input_size,
+            hidden_size=hidden_size,
             num_layers=num_layers,
             dropout=dropout,
             bidirectional=bidirectional,
@@ -44,14 +44,9 @@ class LSTMSimple(nn.Module):
             x.size(0),
             self.hidden_size,
         ).to(x.device)
-        c_0 = torch.zeros(
-            self.num_layers * (2 if self.bidirectional else 1),
-            x.size(0),
-            self.hidden_size,
-        ).to(x.device)
 
-        # forward lstm & fcn
-        out, _ = self.lstm(x, (h_0, c_0))
+        # forward gru & fcn
+        out, _ = self.gru(x, h_0)
         out = self.fc(out[:, -1, :])
         return out
 

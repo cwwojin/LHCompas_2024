@@ -7,13 +7,13 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import MLFlowLogger
 import torch.optim as optim
 
-from compas.models import LSTMSimple
+from compas.models import GRUSimple
 
 
-# Lightning module - LSTM
-class LSTMSimpleLightningModule(pl.LightningModule):
+# Lightning module - GRU
+class GRUSimpleLightningModule(pl.LightningModule):
     def __init__(self, model=None, cfg=None, scaler=None, no_val=False):
-        super(LSTMSimpleLightningModule, self).__init__()
+        super(GRUSimpleLightningModule, self).__init__()
         assert (model is not None) or (cfg is not None)
 
         # init by either model or CfgNode
@@ -21,7 +21,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
             self.model = model
         else:
             assert scaler is not None, "Dataset Scaler must be provided with CfgNode"
-            self.model = LSTMSimple(
+            self.model = GRUSimple(
                 input_size=cfg["input_size"],
                 input_steps=cfg["input_steps"],
                 output_steps=cfg["output_steps"],
