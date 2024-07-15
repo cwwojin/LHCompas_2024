@@ -58,6 +58,7 @@ def runExp_GRU():
             hidden_size=cfg.GRU.HIDDEN_SIZE,
             dropout=cfg.GRU.DROPOUT,
             bidirectional=cfg.GRU.BIDIRECTIONAL,
+            x_cols=data_module.x_cols,
         ),
         scaler=data_module.scaler,
         no_val=NO_VAL,

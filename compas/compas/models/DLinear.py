@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from typing import Any
+from typing import Any, List
 
 
 class moving_avg(nn.Module):
@@ -74,10 +74,12 @@ class DLinear(nn.Module):
         kernel_size: int = 25,
         individual: bool = False,
         scaler: Any = None,
+        feature_names: List[str] = [],
     ):
         super(DLinear, self).__init__()
         self.input_steps = input_steps
         self.output_steps = output_steps
+        self.feature_names = feature_names
 
         # Decompsition Kernel Size
         self.kernel_size = kernel_size

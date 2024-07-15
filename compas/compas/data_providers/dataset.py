@@ -8,6 +8,19 @@ from typing import Union, List
 
 # Dataset - Single Series
 class TSSingleDataset(Dataset):
+    """
+    Dataset - Single Series
+        Dataset class for single time-series dataset.
+    ---
+    (Parameters)
+        data : (DataFrame) initial dataframe
+        x_cols : (List[str]) list of column names to use from the dataframe
+        input_steps : (int) model input sequence length
+        output_steps : (int) model output sequence length
+        scaler : (StandardScaler) scaler to use for dataset preprocessing (default = None)
+            setting this parameter will use the pre-trained scaler without fitting
+    """
+
     def __init__(self, data, x_cols, input_steps, output_steps, scaler=None):
         self.dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         self.input_steps = input_steps
@@ -41,6 +54,21 @@ class TSSingleDataset(Dataset):
 
 # Dataset - Multi Series
 class TSMultiDataset(Dataset):
+    """
+    Dataset - Multi Series
+        Dataset class for multiple-time-series dataset.
+    ---
+    (Parameters)
+        data : (List[DataFrame]) list of initial dataframe(s).
+            each dataframe is interpreted as individual time-series datasets.
+            The combined dataset will be generated from these dataframes.
+        x_cols : (List[str]) list of column names to use from the dataframe(s)
+        input_steps : (int) model input sequence length
+        output_steps : (int) model output sequence length
+        scaler : (StandardScaler) scaler to use for dataset preprocessing (default = None)
+            setting this parameter will use the pre-trained scaler without fitting
+    """
+
     def __init__(
         self,
         data: Union[List[pd.DataFrame], pd.DataFrame],

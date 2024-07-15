@@ -58,6 +58,7 @@ def runExp_LSTM():
             hidden_size=cfg.LSTM.HIDDEN_SIZE,
             dropout=cfg.LSTM.DROPOUT,
             bidirectional=cfg.LSTM.BIDIRECTIONAL,
+            x_cols=data_module.x_cols,
         ),
         scaler=data_module.scaler,
         no_val=NO_VAL,
