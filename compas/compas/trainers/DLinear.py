@@ -7,13 +7,13 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import MLFlowLogger
 import torch.optim as optim
 
-from compas.models import LSTMSimple
+from compas.models import DLinear
 
 
-# Lightning module - LSTM
-class LSTMSimpleLightningModule(pl.LightningModule):
+# Lightning module - DLinear
+class DLinearLightningModule(pl.LightningModule):
     def __init__(self, model=None, cfg=None, scaler=None, no_val=False):
-        super(LSTMSimpleLightningModule, self).__init__()
+        super(DLinearLightningModule, self).__init__()
         assert (model is not None) or (cfg is not None)
 
         # init by either model or CfgNode
@@ -21,14 +21,12 @@ class LSTMSimpleLightningModule(pl.LightningModule):
             self.model = model
         else:
             assert scaler is not None, "Dataset Scaler must be provided with CfgNode"
-            self.model = LSTMSimple(
-                input_size=cfg["input_size"],
+            self.model = DLinear(
                 input_steps=cfg["input_steps"],
                 output_steps=cfg["output_steps"],
-                hidden_size=cfg["hidden_size"],
-                num_layers=cfg["num_layers"],
-                dropout=cfg["dropout"],
-                bidirectional=cfg["bidirectional"] if "bidirectional" in cfg else False,
+                kernel_size=cfg["kernel_size"],
+                channels=cfg["channels"],
+                individual=cfg["individual"],
                 scaler=scaler,
                 feature_names=cfg["x_cols"],
             )
@@ -44,14 +42,11 @@ class LSTMSimpleLightningModule(pl.LightningModule):
 
     def on_train_start(self):
         params = dict(
-            input_size=self.model.input_size,
             input_steps=self.model.input_steps,
             output_steps=self.model.output_steps,
-            output_size=self.model.output_size,
-            num_layers=self.model.num_layers,
-            hidden_size=self.model.hidden_size,
-            dropout=self.model.dropout,
-            bidirectional=self.model.bidirectional,
+            kernel_size=self.model.kernel_size,
+            channels=self.model.channels,
+            individual=self.model.individual,
             criterion="mse",
             use_validation=not self.no_val,
             feature_names=self.x_cols,
@@ -60,7 +55,6 @@ class LSTMSimpleLightningModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         self.log_dict(
@@ -73,7 +67,6 @@ class LSTMSimpleLightningModule(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         self.log_dict(
@@ -106,7 +99,6 @@ class LSTMSimpleLightningModule(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         self.test_predictions.append((y_hat, y))
@@ -121,12 +113,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         x, _ = batch
-        y_hat = self(x)
-
-        # Reshape y_hat as time series (B, output_steps, input_size)
-        batch_size = x.size(0)
-        preds = y_hat.view(batch_size, self.model.output_steps, self.model.input_size)
-
+        preds = self(x)
         return preds
 
     def configure_optimizers(self):
