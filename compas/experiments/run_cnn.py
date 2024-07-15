@@ -8,6 +8,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor
 from datetime import datetime
 from argparse import ArgumentParser
 import warnings
+import mlflow
 
 warnings.filterwarnings("ignore", ".*does not have many workers.*")
 
@@ -51,6 +52,7 @@ def runExp_CNN1D():
     model = CNN1DSimpleLightningModule(
         cfg=dict(
             input_size=data_module.n_features,
+            output_size=cfg.OUTPUT_SIZE,
             kernel_size=cfg.CNN1D.KERNEL_SIZE,
             stride=cfg.CNN1D.STRIDE,
             hidden_size=cfg.CNN1D.HIDDEN_SIZE,
