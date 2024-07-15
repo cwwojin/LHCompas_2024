@@ -31,6 +31,18 @@ $ python compas/experiments/run_LSTM.py --config="compas/experiments/config/lstm
 
 To run your own experiments, edit the `.yaml` file and pass as argument.
 
+### 2.3. Run Inference with trained Model
+
+```python
+import pandas as pd
+from compas.inference import ForecastModel
+
+model = ForecastModel(model_path="path/to/model")
+df = pd.read_csv("path/to/data.csv")
+
+model.forecast(df, steps=12)
+```
+
 ## 3. Contribution
 
 ### 3.1. Branch Naming
