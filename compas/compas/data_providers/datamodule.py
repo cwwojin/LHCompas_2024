@@ -8,6 +8,21 @@ from compas.data_providers import TSSingleDataset, TSMultiDataset
 
 # DataModule - Single Series
 class TSSingleDataModule(pl.LightningDataModule):
+    """
+    DataModule - Single Series
+        Dataset class for single-time-series dataset.
+    ---
+    (Parameters)
+        data_path : (str) path to the data csv file
+        emd_cd : (str) the EMD-code to use. A subset of the dataset with column EMD_CD == emd_cd will be used
+        input_steps : (int) model input sequence length
+        output_steps : (int) model output sequence length
+        test_size : (int) size of test set
+        val_size : (int) size of validation set
+        batch_size : (int) batch size
+        x_cols : (List[str]) list of column names to use from the dataframe(s)
+    """
+
     def __init__(
         self,
         data_path: str,
@@ -82,6 +97,20 @@ class TSSingleDataModule(pl.LightningDataModule):
 
 # DataModule - Multi Series
 class TSMultiDataModule(pl.LightningDataModule):
+    """
+    DataModule - Single Series
+        Dataset class for single-time-series dataset.
+    ---
+    (Parameters)
+        data_path : (str) path to the data csv file
+        input_steps : (int) model input sequence length
+        output_steps : (int) model output sequence length
+        test_size : (int) size of test set
+        val_size : (int) size of validation set
+        batch_size : (int) batch size
+        x_cols : (List[str]) list of column names to use from the dataframe(s)
+    """
+
     def __init__(
         self,
         data_path: str,

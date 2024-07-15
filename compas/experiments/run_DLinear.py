@@ -56,6 +56,7 @@ def runExp_DLinear():
             channels=data_module.n_features,
             kernel_size=cfg.DLINEAR.KERNEL_SIZE,
             individual=cfg.DLINEAR.INDIVIDUAL,
+            x_cols=data_module.x_cols,
         ),
         scaler=data_module.scaler,
         no_val=NO_VAL,

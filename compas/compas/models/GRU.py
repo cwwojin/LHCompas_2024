@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from typing import List
 
 
 # Simple GRU model
@@ -14,6 +15,7 @@ class GRUSimple(nn.Module):
         dropout=0,
         bidirectional=False,
         scaler=None,
+        feature_names: List[str] = [],
     ):
         super(GRUSimple, self).__init__()
         self.input_size = input_size
@@ -36,6 +38,7 @@ class GRUSimple(nn.Module):
         self.fc = nn.Linear(
             hidden_size * (2 if self.bidirectional else 1), self.output_size
         )
+        self.feature_names = feature_names
 
     def forward(self, x):
         # hidden state

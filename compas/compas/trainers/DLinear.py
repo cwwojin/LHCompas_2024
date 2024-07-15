@@ -28,12 +28,14 @@ class DLinearLightningModule(pl.LightningModule):
                 channels=cfg["channels"],
                 individual=cfg["individual"],
                 scaler=scaler,
+                feature_names=cfg["x_cols"],
             )
 
         self.scaler = self.model.scaler
         self.criterion = nn.MSELoss()
         self.test_predictions = []
         self.no_val = no_val
+        self.x_cols = self.model.feature_names
 
     def forward(self, x):
         return self.model(x)
@@ -47,6 +49,7 @@ class DLinearLightningModule(pl.LightningModule):
             individual=self.model.individual,
             criterion="mse",
             use_validation=not self.no_val,
+            feature_names=self.x_cols,
         )
         self.logger.log_hyperparams(params=params)
 
