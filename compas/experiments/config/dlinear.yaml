@@ -1,0 +1,14 @@
+MODEL_TYPE: lstm
+DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
+INPUT_STEPS: 6
+OUTPUT_STEPS: 1
+TEST_SIZE: 12
+VAL_SIZE: 0
+DLINEAR:
+    KERNEL_SIZE: 25
+    INDIVIDUAL: False
+N_EPOCHS: 20
+BATCH_SIZE: 8
+MLFLOW_TRACKING_URI: "databricks"
+DATABRICKS_WORKSPACE: "/Users/cwwojin@gmail.com"
+EXPERIMENT_NAME: "Compas_DLinear"

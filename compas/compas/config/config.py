@@ -35,6 +35,10 @@ _C.GRU.BIDIRECTIONAL = False
 
 _C.CNN = CN()
 
+_C.DLINEAR = CN()
+_C.DLINEAR.KERNEL_SIZE = 2
+_C.DLINEAR.INDIVIDUAL = False
+
 # -----------------------------------------------------------------------------
 # Experiment Config
 # -----------------------------------------------------------------------------
