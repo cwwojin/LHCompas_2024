@@ -13,10 +13,9 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
-            - run: cd compas
             - name: Run Black Formatter
               uses: psf/black@stable
               with:
                   options: "--check --verbose"
                   src: "./compas"
-                  use_pyproject: true
+                  version: "~= 22.0"
