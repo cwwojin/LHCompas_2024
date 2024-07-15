@@ -13,7 +13,7 @@ import warnings
 warnings.filterwarnings("ignore", ".*does not have many workers.*")
 
 from compas.data_providers import TSMultiDataModule
-from compas.trainers import LSTMSimpleLightningModule
+from compas.trainers import GRUSimpleLightningModule
 from compas.config import get_cfg_defaults
 
 
@@ -27,7 +27,7 @@ def get_args():
     return parser.parse_args()
 
 
-def runExp_LSTM():
+def runExp_GRU():
     args = get_args()
 
     # load config from .yaml file
@@ -49,15 +49,15 @@ def runExp_LSTM():
 
     # Prepare model
     NO_VAL = cfg.VAL_SIZE <= 0
-    model = LSTMSimpleLightningModule(
+    model = GRUSimpleLightningModule(
         cfg=dict(
             input_size=data_module.n_features,
             input_steps=cfg.INPUT_STEPS,
             output_steps=cfg.OUTPUT_STEPS,
-            num_layers=cfg.LSTM.NUM_LAYERS,
-            hidden_size=cfg.LSTM.HIDDEN_SIZE,
-            dropout=cfg.LSTM.DROPOUT,
-            bidirectional=cfg.LSTM.BIDIRECTIONAL,
+            num_layers=cfg.GRU.NUM_LAYERS,
+            hidden_size=cfg.GRU.HIDDEN_SIZE,
+            dropout=cfg.GRU.DROPOUT,
+            bidirectional=cfg.GRU.BIDIRECTIONAL,
         ),
         scaler=data_module.scaler,
         no_val=NO_VAL,
@@ -100,7 +100,7 @@ def runExp_LSTM():
     )
 
     # Export to TorchScript
-    model_name = f"LSTM_{'bi' if model.model.bidirectional else 'uni'}_in_{data_module.input_steps}_out_{data_module.output_steps}_train_{len(data_module.train)}_val_{cfg.VAL_SIZE}_{timestamp}"
+    model_name = f"GRU_{'bi' if model.model.bidirectional else 'uni'}_in_{data_module.input_steps}_out_{data_module.output_steps}_train_{len(data_module.train)}_val_{cfg.VAL_SIZE}_{timestamp}"
     scripted_model = torch.jit.script(model.model)
     export_path = f".saved_models/{model_name}"
     if not path.isdir(export_path):
@@ -119,4 +119,4 @@ def runExp_LSTM():
 
 
 if __name__ == "__main__":
-    runExp_LSTM()
+    runExp_GRU()
