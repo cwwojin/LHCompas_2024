@@ -41,7 +41,7 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
         params = dict(
             input_size=self.model.conv1.in_channels,
             output_size=self.model.fc.out_features,
-            hidden_size=self.model.conv1.out_channels,
+            hidden_size=self.model.conv1.kernel_size,
             kernel_size=self.model.conv1.kernel_size[0],
             dropout=self.model.dropout.p,
             criterion="mse",

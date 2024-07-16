@@ -10,6 +10,8 @@ from argparse import ArgumentParser
 import warnings
 import mlflow
 
+import pandas as pd
+
 warnings.filterwarnings("ignore", ".*does not have many workers.*")
 
 from compas.data_providers import TSMultiDataModule
@@ -44,6 +46,7 @@ def runExp_CNN1D():
         batch_size=cfg.BATCH_SIZE,
         x_cols=cfg.X_COLS,
     )
+    
     data_module.prepare_data()
     data_module.setup()
 
@@ -52,7 +55,7 @@ def runExp_CNN1D():
     model = CNN1DSimpleLightningModule(
         cfg=dict(
             input_size=data_module.n_features,
-            output_size=cfg.OUTPUT_SIZE,
+            output_size=cfg.CNN1D.OUTPUT_SIZE,
             kernel_size=cfg.CNN1D.KERNEL_SIZE,
             stride=cfg.CNN1D.STRIDE,
             hidden_size=cfg.CNN1D.HIDDEN_SIZE,
@@ -119,4 +122,77 @@ def runExp_CNN1D():
 
 
 if __name__ == "__main__":
-    runExp_CNN1D()
+    #runExp_CNN1D()
+
+    args = get_args()
+
+    # load config from .yaml file
+    cfg = get_cfg_defaults()
+    cfg.merge_from_file(args.config)
+
+    data = TSMultiDataModule(
+        data_path=cfg.DATA_PATH,
+        input_steps=cfg.INPUT_STEPS,
+        output_steps=cfg.OUTPUT_STEPS,
+        test_size=cfg.TEST_SIZE,
+        val_size=cfg.VAL_SIZE,
+        batch_size=cfg.BATCH_SIZE,
+        x_cols=cfg.X_COLS,
+    )
+
+    print(data.input_steps, data.output_steps)
+    sample_df = pd.read_csv(data.data_path)
+    sample_df.dropna(how="any", inplace=True)
+    sample_df.set_index("EMD_CD", inplace=True)
+    df_list = [sample_df.loc[emd].reset_index(drop=False).sort_values(by="STD_YM")
+               for emd in sample_df.index.unique()]
+    
+    #print(df_list)
+    
+    data.prepare_data()
+    data.setup()
+
+    NO_VAL = cfg.VAL_SIZE <= 0
+    model = CNN1DSimpleLightningModule(
+        cfg=dict(
+            input_size=data.n_features,
+            output_size=cfg.CNN1D.OUTPUT_SIZE,
+            kernel_size=cfg.CNN1D.KERNEL_SIZE,
+            stride=cfg.CNN1D.STRIDE,
+            hidden_size=cfg.CNN1D.HIDDEN_SIZE,
+            dropout=cfg.CNN1D.DROPOUT,
+            num_layers=cfg.CNN1D.NUM_LAYERS,
+        ),
+        scaler=data.scaler,
+        no_val=NO_VAL,
+    )
+    print(model)
+    
+    if cfg.MLFLOW_TRACKING_URI == "databricks":
+        mlflow.login()
+    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%m-%s")
+
+    trainer = pl.Trainer(
+        max_epochs=cfg.N_EPOCHS,
+        devices="auto",
+        logger=MLFlowLogger(
+            experiment_name=f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}",
+            run_name=f"run_{timestamp}",
+            tracking_uri=cfg.MLFLOW_TRACKING_URI,
+            log_model=True,
+        ),
+        check_val_every_n_epoch=1,
+        default_root_dir=".logs/",
+        callbacks=[
+            LearningRateMonitor(logging_interval="epoch"),
+        ],
+        # skip validation if VAL_SIZE == 0
+        limit_val_batches=0 if NO_VAL else None,
+        num_sanity_val_steps=0 if NO_VAL else None,
+    )
+
+    # Train
+    trainer.fit(
+        model=model,
+        datamodule=data,
+    )
