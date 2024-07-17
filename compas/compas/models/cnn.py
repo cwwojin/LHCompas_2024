@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 """
     Convolution Neural Network
     ---
@@ -33,10 +34,10 @@ class CNN1DSimple(nn.Module):
         x = self.conv1(x)
         x = self.relu(x)
         x = self.dropout(x)
-        
+
         x = x.view(x.size(0), -1)
-        
+
         x = self.fc(x)
-        
+
         return x
 

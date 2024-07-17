@@ -59,7 +59,14 @@ model.forecast(df, steps=12)
 $ git config commit.template .gitmessage.txt
 ```
 
-### 3.3.
+### 3.3. Code Formatting with Black
+
+-   We use the `Black` formatter with its default settings for this repository.
+
+```shell
+$ pip install black
+$ black compas/
+```
 
 ---
 
