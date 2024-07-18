@@ -34,7 +34,6 @@ class CNN1DSimple(nn.Module):
         conv_output_size = input_size - kernel_size + 1
         self.fc = nn.Linear(hidden_size * conv_output_size, output_size)
 
-     
     def forward(self, x):
         x = self.conv1(x)
         x = self.relu(x)

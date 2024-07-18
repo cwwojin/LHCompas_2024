@@ -47,7 +47,6 @@ def runExp_CNN1D():
         x_cols=cfg.X_COLS,
     )
 
-
     data_module.prepare_data()
     data_module.setup()
 
