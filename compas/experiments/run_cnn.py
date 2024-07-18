@@ -60,7 +60,6 @@ def runExp_CNN1D():
             stride=cfg.CNN1D.STRIDE,
             hidden_size=cfg.CNN1D.HIDDEN_SIZE,
             dropout=cfg.CNN1D.DROPOUT,
-            num_layers=cfg.CNN1D.NUM_LAYERS,
         ),
         scaler=data_module.scaler,
         no_val=NO_VAL,

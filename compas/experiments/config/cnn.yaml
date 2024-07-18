@@ -1,6 +1,6 @@
-MODEL_TYPE: cnn1d
+MODEL_TYPE: lstm
 DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv" # shape = 28 * 486
-INPUT_STEPS: 1
+INPUT_STEPS: 3
 OUTPUT_STEPS: 1
 
 TEST_SIZE: 6
@@ -11,10 +11,9 @@ CNN1D:
   STRIDE: 1
   HIDDEN_SIZE: 32
   DROPOUT: 0.3
-  NUM_LAYERS: 5
   OUTPUT_SIZE: 1
 N_EPOCHS: 50
-BATCH_SIZE: 5
+BATCH_SIZE: 8
 MLFLOW_TRACKING_URI: "databricks"
 DATABRICKS_WORKSPACE: "/Users/jjdg148@gmail.com"
 EXPERIMENT_NAME: "Compas_CNN"

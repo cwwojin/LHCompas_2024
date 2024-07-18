@@ -27,25 +27,29 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
                 hidden_size=cfg["hidden_size"],
                 kernel_size=cfg["kernel_size"],
                 dropout=cfg["dropout"],
+                scaler=scaler,
+                feature_names=cfg["x_cols"],
             )
 
         self.scaler = scaler
         self.criterion = nn.MSELoss()
         self.test_predictions = []
         self.no_val = no_val
+        self.x_cols = self.model.feature_names
 
     def forward(self, x):
         return self.model(x)
 
     def on_train_start(self):
         params = dict(
-            input_size=self.model.conv1.in_channels,
+            input_size=self.model.input_size,
             output_size=self.model.fc.out_features,
-            hidden_size=self.model.conv1.kernel_size,
+            hidden_size=self.model.hidden_size,
             kernel_size=self.model.conv1.kernel_size[0],
-            dropout=self.model.dropout.p,
+            dropout=self.model.dropout,
             criterion="mse",
             use_validation=not self.no_val,
+            feature_names=self.x_cols,
         )
         self.logger.log_hyperparams(params=params)
 
