@@ -107,6 +107,8 @@ def get_model_name(cfg, timestamp):
         raise NotImplementedError(
             "supported model types are : 'lstm', 'gru', 'dlinear', 'cnn'"
         )
+    if cfg.RUN_NAME:
+        model_name = f"{cfg.RUN_NAME}_{model_name}"
     return model_name
 
 
@@ -148,7 +150,9 @@ def run_experiment(args: dict):
         devices="auto",
         logger=MLFlowLogger(
             experiment_name=f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}",
-            run_name=f"run_{timestamp}",
+            run_name=(
+                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
+            ),
             tracking_uri=cfg.MLFLOW_TRACKING_URI,
             log_model=True,
         ),
