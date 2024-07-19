@@ -1,9 +1,9 @@
 MODEL_TYPE: gru
-DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
+DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv"
 INPUT_STEPS: 3
 OUTPUT_STEPS: 1
-TEST_SIZE: 12
-VAL_SIZE: 0
+TEST_SIZE: 6
+VAL_SIZE: 6
 GRU:
     NUM_LAYERS: 2
     HIDDEN_SIZE: 64

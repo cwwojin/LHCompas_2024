@@ -1,9 +1,9 @@
 MODEL_TYPE: dlinear
-DATA_PATH: "data/custom/tmp_dataset_with_interest_col_modified.csv"
-INPUT_STEPS: 6
-OUTPUT_STEPS: 2
-TEST_SIZE: 12
-VAL_SIZE: 0
+DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv"
+INPUT_STEPS: 3
+OUTPUT_STEPS: 1
+TEST_SIZE: 6
+VAL_SIZE: 6
 DLINEAR:
     KERNEL_SIZE: 25
     INDIVIDUAL: True

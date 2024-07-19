@@ -24,6 +24,9 @@ class CNN1DSimple(nn.Module):
             B - Batch size, L_in - input length, C - n_features
         output : [B, L_out * C]
             B - Batch size, L_out - output length, C - n_features
+
+        (conv1D layer output) : [B, (input_steps - kernel_size + 1), hidden_size]
+
     """
 
     def __init__(

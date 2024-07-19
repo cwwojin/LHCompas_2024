@@ -10,8 +10,8 @@ _C = CN()
 _C.DATA_PATH = "./data/custom/LH_Dataset.csv"
 _C.INPUT_STEPS = 3
 _C.OUTPUT_STEPS = 1
-_C.TEST_SIZE = 12
-_C.VAL_SIZE = 12
+_C.TEST_SIZE = 6
+_C.VAL_SIZE = 6
 _C.X_COLS = None
 
 # -----------------------------------------------------------------------------
