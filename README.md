@@ -26,7 +26,7 @@ Testing done using conda environment.
 ### 2.2. Run an Experiment
 
 ```shell
-$ python compas/experiments/run_LSTM.py --config="compas/experiments/config/lstm.yaml"
+$ python compas/experiments/run_Exp.py --config="compas/experiments/config/lstm.yaml"
 ```
 
 To run your own experiments, edit the `.yaml` file and pass as argument.

@@ -54,6 +54,7 @@ _C.BATCH_SIZE = 8
 _C.MLFLOW_TRACKING_URI = "databricks"
 _C.DATABRICKS_WORKSPACE = "/Users/user"
 _C.EXPERIMENT_NAME = "experiment"
+_C.RUN_NAME = None
 
 
 def get_cfg_defaults():
