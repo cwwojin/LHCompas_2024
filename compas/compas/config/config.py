@@ -10,8 +10,8 @@ _C = CN()
 _C.DATA_PATH = "./data/custom/LH_Dataset.csv"
 _C.INPUT_STEPS = 3
 _C.OUTPUT_STEPS = 1
-_C.TEST_SIZE = 12
-_C.VAL_SIZE = 12
+_C.TEST_SIZE = 6
+_C.VAL_SIZE = 6
 _C.X_COLS = None
 
 # -----------------------------------------------------------------------------
@@ -34,6 +34,10 @@ _C.GRU.DROPOUT = 0.0
 _C.GRU.BIDIRECTIONAL = False
 
 _C.CNN = CN()
+_C.CNN.KERNEL_SIZE = 1
+_C.CNN.HIDDEN_SIZE = 32
+_C.CNN.DROPOUT = 0.1
+_C.CNN.ACTIVATION = "relu"
 
 _C.DLINEAR = CN()
 _C.DLINEAR.KERNEL_SIZE = 2
