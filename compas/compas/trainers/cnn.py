@@ -22,11 +22,13 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
         else:
             assert scaler is not None, "Dataset Scaler must be provided with CfgNode"
             self.model = CNN1DSimple(
-                input_size=cfg["input_size"],
-                output_size=cfg["output_size"],
+                in_channels=cfg["in_channels"],
+                input_steps=cfg["input_steps"],
+                output_steps=cfg["output_steps"],
                 hidden_size=cfg["hidden_size"],
                 kernel_size=cfg["kernel_size"],
                 dropout=cfg["dropout"],
+                activation=cfg["activation"],
                 scaler=scaler,
                 feature_names=cfg["x_cols"],
             )
@@ -42,11 +44,13 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
 
     def on_train_start(self):
         params = dict(
-            input_size=self.model.input_size,
-            output_size=self.model.fc.out_features,
+            input_steps=self.model.input_steps,
+            output_steps=self.model.output_steps,
+            in_channels=self.model.in_channels,
             hidden_size=self.model.hidden_size,
-            kernel_size=self.model.conv1.kernel_size[0],
+            kernel_size=self.model.kernel_size,
             dropout=self.model.dropout,
+            activation_type=self.model.activation_type,
             criterion="mse",
             use_validation=not self.no_val,
             feature_names=self.x_cols,

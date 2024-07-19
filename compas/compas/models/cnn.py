@@ -2,60 +2,75 @@ import torch
 import torch.nn as nn
 from typing import List
 
-"""
+
+class CNN1DSimple(nn.Module):
+    """
     Convolution Neural Network
     ---
     (Parameters)
-        input_size : input sequence length (num of time steps)
-        output_size : output sequence length
-        hidden_size : num of neurons in fully connected layer
-        kernel_size : kernel size for CNN
-            kernel_size < input_steps
-        dropout : dropout probability
+        in_channels : number of features in input / output (n_features)
+        input_steps : input sequence length
+        output_steps : output sequence length (number of time steps to predict)
+        hidden_size : number of output channels of 1D-convolution
+        kernel_size : kernel size of 1D-convolution
+        dropout : dropout rate
+        activation : type of activation. one of - 'relu', 'tanh'
+        scaler : dataset scaler
+        feature_names : list of data feature names
 
     ---
     (Dimensions)
         input : [B, L_in, C]
-            B - Batch size, L_in - input length, C - channels
-        output : [B, L_out, C]
-            B - Batch size, L_out - output length, C - channels
+            B - Batch size, L_in - input length, C - n_features
+        output : [B, L_out * C]
+            B - Batch size, L_out - output length, C - n_features
     """
 
-
-class CNN1DSimple(nn.Module):
     def __init__(
         self,
-        input_size,
-        output_size,
+        in_channels,
+        input_steps,
+        output_steps,
         hidden_size,
         kernel_size,
         dropout,
+        activation="relu",
         scaler=None,
         feature_names: List[str] = [],
     ):
         super(CNN1DSimple, self).__init__()
-        self.input_size = input_size
-        self.conv1 = nn.Conv1d(
-            in_channels=3, out_channels=hidden_size, kernel_size=kernel_size, stride=1
-        )
-        self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(dropout)
+        assert activation in {
+            "relu",
+            "tanh",
+        }, "activation should be one of : 'relu', 'tanh'"
+        self.input_steps = input_steps
+        self.output_steps = output_steps
+        self.in_channels = in_channels
+        self.kernel_size = kernel_size
         self.hidden_size = hidden_size
-        conv_output_size = input_size - kernel_size + 1
-        self.fc = nn.Linear(hidden_size * conv_output_size, output_size)
+        self.output_size = output_steps * in_channels  # in_channels == n_features
+        self.activation_type = activation
+        self.dropout = dropout
         self.feature_names = feature_names
+
+        # conv_output_size = input_steps - kernel_size + 1
+        self.layers = nn.Sequential(
+            nn.Conv1d(
+                in_channels=in_channels,
+                out_channels=hidden_size,
+                kernel_size=kernel_size,
+            ),
+            nn.Tanh() if self.activation_type == "tanh" else nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Flatten(start_dim=1),
+            nn.Linear(hidden_size * (input_steps - kernel_size + 1), self.output_size),
+        )
         self.scaler = scaler
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-
-        x = x.view(x.size(0), -1)
-
-        x = self.fc(x)
-
-        return x
+        x = x.permute(0, 2, 1)
+        out = self.layers(x)
+        return out
 
     @torch.no_grad()
     def predict(self, x, steps: int):

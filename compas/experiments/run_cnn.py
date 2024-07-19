@@ -50,16 +50,18 @@ def runExp_CNN1D():
     data_module.prepare_data()
     data_module.setup()
 
-    # Prepare model - Assuming CNN1DSimpleLightningModule is defined similarly
+    # Prepare model
     NO_VAL = cfg.VAL_SIZE <= 0
     model = CNN1DSimpleLightningModule(
         cfg=dict(
-            input_size=data_module.n_features,
-            output_size=cfg.CNN1D.OUTPUT_SIZE,
-            kernel_size=cfg.CNN1D.KERNEL_SIZE,
-            stride=cfg.CNN1D.STRIDE,
-            hidden_size=cfg.CNN1D.HIDDEN_SIZE,
-            dropout=cfg.CNN1D.DROPOUT,
+            in_channels=data_module.n_features,
+            input_steps=cfg.INPUT_STEPS,
+            output_steps=cfg.OUTPUT_STEPS,
+            hidden_size=cfg.CNN.HIDDEN_SIZE,
+            kernel_size=cfg.CNN.KERNEL_SIZE,
+            dropout=cfg.CNN.DROPOUT,
+            activation=cfg.CNN.ACTIVATION,
+            x_cols=data_module.x_cols,
         ),
         scaler=data_module.scaler,
         no_val=NO_VAL,

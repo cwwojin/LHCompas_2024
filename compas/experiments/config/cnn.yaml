@@ -1,20 +1,17 @@
-MODEL_TYPE: lstm
+MODEL_TYPE: cnn
 DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv" # shape = 28 * 486
 INPUT_STEPS: 3
 OUTPUT_STEPS: 1
 
 TEST_SIZE: 6
 VAL_SIZE: 6
-CNN1D:
+CNN:
   KERNEL_SIZE: 1
-  INPUT_SIZE: 26
-  STRIDE: 1
-  HIDDEN_SIZE: 32
-  DROPOUT: 0.3
-  OUTPUT_SIZE: 1
+  HIDDEN_SIZE: 64
+  DROPOUT: 0.2
+  ACTIVATION: relu
 N_EPOCHS: 50
 BATCH_SIZE: 8
 MLFLOW_TRACKING_URI: "databricks"
-DATABRICKS_WORKSPACE: "/Users/jjdg148@gmail.com"
+DATABRICKS_WORKSPACE: "/Users/cwwojin@gmail.com"
 EXPERIMENT_NAME: "Compas_CNN"
-
