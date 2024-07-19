@@ -22,7 +22,7 @@ class CNN1DSimple(nn.Module):
     (Dimensions)
         input : [B, L_in, C]
             B - Batch size, L_in - input length, C - n_features
-        output : [B, L_out * C]
+        output : [B, L_out, C]
             B - Batch size, L_out - output length, C - n_features
 
         (conv1D layer output) : [B, (input_steps - kernel_size + 1), hidden_size]
@@ -71,37 +71,47 @@ class CNN1DSimple(nn.Module):
         self.scaler = scaler
 
     def forward(self, x):
-        x = x.permute(0, 2, 1)
-        out = self.layers(x)
+        x = x.permute(0, 2, 1)  # (B, in_channels, input_steps)
+        out = self.layers(x)  # out : (B, output_steps * in_channels)
+        out = out.reshape(-1, self.in_channels, self.output_steps)
+        out = out.permute(0, 2, 1)
         return out
 
-    @torch.no_grad()
+    @torch.jit.export
     def predict(self, x, steps: int):
         """
         Perform long-term forecast on the input series.
-        This method is done on unbatched input only.
+        This method is done on unbatched input only
 
-        Parameters:
+        ---
+        (Parameters)
             x : input tensor of shape (L_in, N)
                 L_in - input sequence length
                 N - feature dimension
             steps : integer indicating the number of time steps to predict
+                (default) None, which will use the model default output_steps value
 
-        Returns:
-            out : output tensor of shape (steps, N)
+        ---
+        (Returns)
+            out : output tensor of shape (L_out, N)
         """
-        # Initialize the list to store the forecasted series
-        forecast_series = []
-        current_input = x.unsqueeze(0)  # Add batch dimension
-
-        for _ in range(steps):
-            y_hat = self(current_input)  # y_hat.shape == (B, L_out)
-            forecast_series.append(y_hat.squeeze(0))  # Remove batch dimension
-            current_input = torch.cat(
-                (current_input[:, :, 1:], y_hat.unsqueeze(2)), dim=2
+        with torch.no_grad():
+            # Initialize the list to store the forecasted series
+            forecast_series = []
+            forecast_steps = (steps // self.output_steps) + (
+                1 if (steps % self.output_steps) else 0
             )
 
-        # Combine the forecasts into a continuous time series
-        out = torch.cat(forecast_series, dim=0)
+            # Iteratively forecast the next time steps
+            current_input = x[-self.input_steps :, :].unsqueeze(0)
+            for _ in range(forecast_steps):
+                pred = self(current_input)  # pred.shape == (B, L_out, N)
+                forecast_series.append(pred)
+                current_input = torch.cat(
+                    (current_input[:, self.output_steps :, :], pred), dim=1
+                )
 
-        return out
+            # Combine the forecasts into a continuous time series
+            out = torch.cat(forecast_series, dim=1).squeeze(0)
+
+        return out[:steps, :]

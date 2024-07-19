@@ -59,7 +59,6 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         self.log_dict(
@@ -72,7 +71,6 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         self.log_dict(
@@ -105,7 +103,6 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
         y_hat = self(x)
         loss = self.criterion(y_hat, y)
         self.test_predictions.append((y_hat, y))
@@ -121,9 +118,6 @@ class CNN1DSimpleLightningModule(pl.LightningModule):
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         x, _ = batch
         y_hat = self(x)
-
-        # No need to reshape predictions for CNN model
-
         return y_hat
 
     def configure_optimizers(self):
