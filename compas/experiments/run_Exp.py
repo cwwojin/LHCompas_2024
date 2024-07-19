@@ -110,12 +110,10 @@ def get_model_name(cfg, timestamp):
     return model_name
 
 
-def runExp_LSTM():
-    args = get_args()
-
+def run_experiment(args: dict):
     # load config from .yaml file
     cfg = get_cfg_defaults()
-    cfg.merge_from_file(args.config)
+    cfg.merge_from_file(args["config"])
 
     # Prepare Dataset
     data_module = TSMultiDataModule(
@@ -196,4 +194,5 @@ def runExp_LSTM():
 
 
 if __name__ == "__main__":
-    runExp_LSTM()
+    args = get_args()
+    run_experiment(args=vars(args))
