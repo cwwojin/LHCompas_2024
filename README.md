@@ -87,6 +87,13 @@ To launch specific services / profile, use the Docker Compose CLI
 $ docker compose --profile train up -d
 ```
 
+After launching, attach into the **"trainer"** container to run experiments
+
+```shell
+$ docker attach trainer
+$ python compas/experiments/run_Exp.py --config=compas/experiments/config/lstm.yaml
+```
+
 ## 4. Contribution
 
 ### 4.1. Branch Naming
