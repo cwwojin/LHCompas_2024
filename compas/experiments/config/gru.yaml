@@ -1,5 +1,5 @@
 MODEL_TYPE: gru
-DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv"
+DATA_PATH: "data/dataset_v1.1.csv"
 INPUT_STEPS: 3
 OUTPUT_STEPS: 1
 TEST_SIZE: 6
@@ -7,10 +7,10 @@ VAL_SIZE: 6
 GRU:
     NUM_LAYERS: 2
     HIDDEN_SIZE: 64
-    DROPOUT: 0.0
-    BIDIRECTIONAL: False
+    DROPOUT: 0.2
+    BIDIRECTIONAL: True
 N_EPOCHS: 50
 BATCH_SIZE: 8
-MLFLOW_TRACKING_URI: "databricks"
-DATABRICKS_WORKSPACE: "/Users/cwwojin@gmail.com"
+LOGGER: mlflow
+MLFLOW_TRACKING_URI: "http://mlflow-server:5000/"
 EXPERIMENT_NAME: "Compas_GRU"

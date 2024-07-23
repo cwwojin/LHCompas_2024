@@ -7,7 +7,7 @@ _C = CN()
 # Data Config
 # -----------------------------------------------------------------------------
 
-_C.DATA_PATH = "./data/custom/LH_Dataset.csv"
+_C.DATA_PATH = "./data/LH_Dataset.csv"
 _C.INPUT_STEPS = 3
 _C.OUTPUT_STEPS = 1
 _C.TEST_SIZE = 6
@@ -50,11 +50,14 @@ _C.DLINEAR.INDIVIDUAL = False
 _C.N_EPOCHS = 50
 _C.BATCH_SIZE = 8
 
-# Logger - MLFlow, Databricks
-_C.MLFLOW_TRACKING_URI = "databricks"
-_C.DATABRICKS_WORKSPACE = "/Users/user"
+# Logger - common
+_C.LOGGER = "mlflow"  # one of : {mlflow, tensorboard}
 _C.EXPERIMENT_NAME = "experiment"
 _C.RUN_NAME = None
+
+# Logger - MLFlow, Databricks
+_C.MLFLOW_TRACKING_URI = "http://mlflow-server:5000/"
+_C.DATABRICKS_WORKSPACE = "/Users/user"
 
 
 def get_cfg_defaults():
