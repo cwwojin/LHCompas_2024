@@ -3,7 +3,7 @@ import os.path as path
 import pickle
 import torch
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import MLFlowLogger
+from pytorch_lightning.loggers import MLFlowLogger, TensorBoardLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 import mlflow
 from datetime import datetime
@@ -112,6 +112,33 @@ def get_model_name(cfg, timestamp):
     return model_name
 
 
+def setup_logger(cfg, timestamp):
+    # supported loggers : mlflow, tensorboard
+    if cfg.LOGGER == "mlflow":
+        if cfg.MLFLOW_TRACKING_URI == "databricks":
+            mlflow.login()
+        logger = MLFlowLogger(
+            experiment_name=f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}",
+            run_name=(
+                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
+            ),
+            tracking_uri=cfg.MLFLOW_TRACKING_URI,
+            log_model=True,
+        )
+    elif cfg.LOGGER == "tensorboard":
+        logger = TensorBoardLogger(
+            save_dir=".tensorboard_logs/",
+            name=cfg.EXPERIMENT_NAME,
+            version=(
+                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
+            ),
+            log_graph=False,
+        )
+    else:
+        raise NotImplementedError("supported loggers are : 'mlflow', 'tensorboard'")
+    return logger
+
+
 def run_experiment(args: dict):
     # load config from .yaml file
     cfg = get_cfg_defaults()
@@ -140,22 +167,12 @@ def run_experiment(args: dict):
         scaler=data_module.scaler,
     )
 
-    # Setup Trainer & MLFlow Logger
-    if cfg.MLFLOW_TRACKING_URI == "databricks":
-        mlflow.login()
-    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%m-%s")
-
+    # Setup Trainer & Logger
+    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S")
     trainer = pl.Trainer(
         max_epochs=cfg.N_EPOCHS,
         devices="auto",
-        logger=MLFlowLogger(
-            experiment_name=f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}",
-            run_name=(
-                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
-            ),
-            tracking_uri=cfg.MLFLOW_TRACKING_URI,
-            log_model=True,
-        ),
+        logger=setup_logger(cfg, timestamp),
         check_val_every_n_epoch=1,
         default_root_dir=".logs/",
         callbacks=[

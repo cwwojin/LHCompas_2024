@@ -165,6 +165,7 @@ cython_debug/
 lightning_logs/
 mlruns/
 .logs/
+.tensorboard_logs/
 .saved_models/
 
 # Extras
@@ -173,4 +174,5 @@ mlruns/
 data/
 *tmp*
 *.pt
+*.png
 notebooks/*/
