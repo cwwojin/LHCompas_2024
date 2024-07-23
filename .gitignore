@@ -167,6 +167,7 @@ mlruns/
 .logs/
 .tensorboard_logs/
 .saved_models/
+.mlflow_db/
 
 # Extras
 .DS_Store

@@ -1,0 +1,12 @@
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-devel as base
+
+# Install packages & set working-directory
+RUN apt-get -y -qq update &&\
+    apt-get install -y git wget &&\
+    rm -rf /var/lib/apt/lists/*
+WORKDIR /usr/LHCompas_2024
+COPY ./compas ./compas
+
+# Trainer image
+FROM base as trainer
+RUN pip install -e compas/

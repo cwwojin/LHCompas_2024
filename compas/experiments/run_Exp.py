@@ -117,8 +117,11 @@ def setup_logger(cfg, timestamp):
     if cfg.LOGGER == "mlflow":
         if cfg.MLFLOW_TRACKING_URI == "databricks":
             mlflow.login()
+            experiment_name = f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}"
+        else:
+            experiment_name = cfg.EXPERIMENT_NAME
         logger = MLFlowLogger(
-            experiment_name=f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}",
+            experiment_name=experiment_name,
             run_name=(
                 f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
             ),
