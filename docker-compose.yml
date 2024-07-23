@@ -11,6 +11,12 @@ services:
             dockerfile: Dockerfile.pytorch
             target: trainer
         image: woojin_trainer
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          capabilities: [gpu]
         volumes:
             - ./data/:/usr/LHCompas_2024/data
         stdin_open: true
