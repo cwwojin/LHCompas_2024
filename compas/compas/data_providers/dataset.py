@@ -100,6 +100,7 @@ class TSMultiDataset(Dataset):
             dtype=torch.float32,
         )
         self.n_features = self.data.shape[2]
+        self.shuffled = False
 
     def __len__(self):
         return self.series_length * len(self.df_list)
@@ -116,3 +117,17 @@ class TSMultiDataset(Dataset):
             :,
         ]
         return x, y
+
+    def permute_feature(self, k: int = 0):
+        # permute one column / feature of the dataset (the k-th column)
+        if not self.shuffled:
+            self.data_original = self.data.numpy()
+        permute = self.data.numpy()
+        np.random.shuffle(permute[:, :, k])
+        self.data = torch.tensor(permute, dtype=torch.float32)
+        self.shuffled = True
+
+    def revert_permutation(self):
+        if self.shuffled:
+            self.data = torch.tensor(self.data_original, dtype=torch.float32)
+        self.shuffled = False

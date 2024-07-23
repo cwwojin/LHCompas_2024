@@ -49,6 +49,9 @@ _C.DLINEAR.INDIVIDUAL = False
 
 _C.N_EPOCHS = 50
 _C.BATCH_SIZE = 8
+_C.PERMUTE_IMPORTANCE = (
+    False  # If TRUE, then perform feature importance test & log the result as .csv
+)
 
 # Logger - common
 _C.LOGGER = "mlflow"  # one of : {mlflow, tensorboard}
@@ -56,8 +59,8 @@ _C.EXPERIMENT_NAME = "experiment"
 _C.RUN_NAME = None
 
 # Logger - MLFlow, Databricks
-_C.MLFLOW_TRACKING_URI = "http://mlflow-server:5000/"
-_C.DATABRICKS_WORKSPACE = "/Users/user"
+_C.MLFLOW_TRACKING_URI = "databricks"
+_C.DATABRICKS_WORKSPACE = "/Users/cwwojin@gmail.com"
 
 
 def get_cfg_defaults():
