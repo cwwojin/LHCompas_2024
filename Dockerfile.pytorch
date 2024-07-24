@@ -1,0 +1,17 @@
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-devel as base
+
+# Setup Timezone
+ENV TZ=Asia/Seoul
+RUN apt-get -y -qq update &&\
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&\
+    apt-get install tzdata -y
+
+# Install packages & set working-directory
+RUN apt-get install -y git wget &&\
+    rm -rf /var/lib/apt/lists/*
+WORKDIR /usr/LHCompas_2024
+COPY ./compas ./compas
+
+# Trainer image
+FROM base as trainer
+RUN pip install -e compas/

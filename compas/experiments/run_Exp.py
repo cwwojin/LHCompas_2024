@@ -1,9 +1,11 @@
 import os
 import os.path as path
+import pandas as pd
 import pickle
 import torch
+from torch.utils.data import DataLoader
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import MLFlowLogger
+from pytorch_lightning.loggers import MLFlowLogger, TensorBoardLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 import mlflow
 from datetime import datetime
@@ -112,6 +114,36 @@ def get_model_name(cfg, timestamp):
     return model_name
 
 
+def setup_logger(cfg, timestamp):
+    # supported loggers : mlflow, tensorboard
+    if cfg.LOGGER == "mlflow":
+        if cfg.MLFLOW_TRACKING_URI == "databricks":
+            mlflow.login()
+            experiment_name = f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}"
+        else:
+            experiment_name = cfg.EXPERIMENT_NAME
+        logger = MLFlowLogger(
+            experiment_name=experiment_name,
+            run_name=(
+                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
+            ),
+            tracking_uri=cfg.MLFLOW_TRACKING_URI,
+            log_model=True,
+        )
+    elif cfg.LOGGER == "tensorboard":
+        logger = TensorBoardLogger(
+            save_dir=".tensorboard_logs/",
+            name=cfg.EXPERIMENT_NAME,
+            version=(
+                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
+            ),
+            log_graph=False,
+        )
+    else:
+        raise NotImplementedError("supported loggers are : 'mlflow', 'tensorboard'")
+    return logger
+
+
 def run_experiment(args: dict):
     # load config from .yaml file
     cfg = get_cfg_defaults()
@@ -140,22 +172,12 @@ def run_experiment(args: dict):
         scaler=data_module.scaler,
     )
 
-    # Setup Trainer & MLFlow Logger
-    if cfg.MLFLOW_TRACKING_URI == "databricks":
-        mlflow.login()
-    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%m-%s")
-
+    # Setup Trainer & Logger
+    timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S")
     trainer = pl.Trainer(
         max_epochs=cfg.N_EPOCHS,
         devices="auto",
-        logger=MLFlowLogger(
-            experiment_name=f"{cfg.DATABRICKS_WORKSPACE}/{cfg.EXPERIMENT_NAME}",
-            run_name=(
-                f"{cfg.RUN_NAME}_{timestamp}" if cfg.RUN_NAME else f"run_{timestamp}"
-            ),
-            tracking_uri=cfg.MLFLOW_TRACKING_URI,
-            log_model=True,
-        ),
+        logger=setup_logger(cfg, timestamp),
         check_val_every_n_epoch=1,
         default_root_dir=".logs/",
         callbacks=[
@@ -173,7 +195,7 @@ def run_experiment(args: dict):
     )
 
     # Test
-    trainer.test(
+    test_out = trainer.test(
         model=model,
         datamodule=data_module,
     )
@@ -181,7 +203,7 @@ def run_experiment(args: dict):
     # Export to TorchScript
     model_name = get_model_name(cfg, timestamp=timestamp)
     scripted_model = torch.jit.script(model.model)
-    export_path = f".saved_models/{model_name}"
+    export_path = f"data/.saved_models/{model_name}"
     if not path.isdir(export_path):
         os.makedirs(export_path, exist_ok=True)
     torch.jit.save(
@@ -192,6 +214,34 @@ def run_experiment(args: dict):
     # Export data scaler as pickle
     with open(f"{export_path}/scaler.pkl", "wb") as f:
         pickle.dump(model.scaler, f)
+
+    # Feature Importance Test
+    if cfg.PERMUTE_IMPORTANCE:
+        eval_out = {"baseline_mse": test_out[-1]["test_mse_loss_epoch"]}
+        for i, feature_name in enumerate(model.x_cols):
+            data_module.test.permute_feature(i)
+            out = trainer.test(
+                model=model,
+                dataloaders=DataLoader(
+                    data_module.test, batch_size=data_module.batch_size, shuffle=False
+                ),
+                verbose=False,
+            )
+            loss_diff = abs(out[-1]["test_mse_loss_epoch"] - eval_out["baseline_mse"])
+            if not feature_name == "vacancy_rate":
+                eval_out[feature_name] = loss_diff
+        eval_out.pop("baseline_mse")
+        importance_sum = sum(list(eval_out.values()))
+        for k, v in eval_out.items():
+            eval_out[k] = v / importance_sum
+        eval_out = dict(sorted(eval_out.items(), key=lambda x: x[1], reverse=True))
+        out_df = pd.DataFrame.from_dict(
+            data=eval_out,
+            orient="index",
+            columns=["feature_importance"],
+        )
+        out_df.index.name = "feature_name"
+        out_df.to_csv(f"{export_path}/feature_importance.csv")
 
     # END
     print("Experiment Done Successfully.")

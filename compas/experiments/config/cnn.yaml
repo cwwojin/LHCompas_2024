@@ -1,5 +1,5 @@
 MODEL_TYPE: cnn
-DATA_PATH: "data/custom/tmp_dataset_with_total_population2024.csv"
+DATA_PATH: "data/dataset_v1.1.csv"
 INPUT_STEPS: 3
 OUTPUT_STEPS: 1
 TEST_SIZE: 6
@@ -11,7 +11,7 @@ CNN:
   ACTIVATION: tanh
 N_EPOCHS: 50
 BATCH_SIZE: 8
-MLFLOW_TRACKING_URI: "databricks"
-DATABRICKS_WORKSPACE: "/Users/jjdg148@gmail.com"
+LOGGER: mlflow
+MLFLOW_TRACKING_URI: "http://mlflow-server:5000/"
 EXPERIMENT_NAME: "Compas_CNN"
 RUN_NAME: "CNN_tanh_kernel_size_1"
