@@ -5,10 +5,11 @@ OUTPUT_STEPS: 1
 TEST_SIZE: 6
 VAL_SIZE: 6
 DLINEAR:
-    KERNEL_SIZE: 25
+    KERNEL_SIZE: 7
     INDIVIDUAL: True
 N_EPOCHS: 50
 BATCH_SIZE: 8
 MLFLOW_TRACKING_URI: "databricks"
-DATABRICKS_WORKSPACE: "/Users/cwwojin@gmail.com"
+DATABRICKS_WORKSPACE: "/Users/jjdg148@gmail.com"
 EXPERIMENT_NAME: "Compas_DLinear"
+RUN_NAME: "DLinear_in_kernel_size_5"
