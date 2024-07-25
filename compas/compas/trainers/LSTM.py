@@ -1,6 +1,7 @@
 import os
 import os.path as path
 import pickle
+import numpy as np
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
@@ -38,6 +39,7 @@ class LSTMSimpleLightningModule(pl.LightningModule):
         self.test_predictions = []
         self.no_val = no_val
         self.x_cols = self.model.feature_names
+        self.test_metrics = []
 
     def forward(self, x):
         return self.model(x)
@@ -106,14 +108,21 @@ class LSTMSimpleLightningModule(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
+        y_flat = y.view(y.size(0), -1)
         y_hat = self(x)
-        loss = self.criterion(y_hat, y)
-        self.test_predictions.append((y_hat, y))
+        loss = self.criterion(y_hat, y_flat)
+        self.test_predictions.append((y_hat, y_flat))
+
+        # vacancy-loss
+        vac_loss = self.criterion(
+            y_hat.reshape_as(y)[:, :, :1],
+            y[:, :, :1],
+        )
 
         self.log_dict(
             {
                 "test_mse_loss": loss,
+                "test_vac_mse_loss": vac_loss,
             },
             on_step=True,
         )

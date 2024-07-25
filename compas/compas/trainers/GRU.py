@@ -106,14 +106,21 @@ class GRUSimpleLightningModule(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        y = y.view(y.size(0), -1)
+        y_flat = y.view(y.size(0), -1)
         y_hat = self(x)
-        loss = self.criterion(y_hat, y)
-        self.test_predictions.append((y_hat, y))
+        loss = self.criterion(y_hat, y_flat)
+        self.test_predictions.append((y_hat, y_flat))
+
+        # vacancy-loss
+        vac_loss = self.criterion(
+            y_hat.reshape_as(y)[:, :, :1],
+            y[:, :, :1],
+        )
 
         self.log_dict(
             {
                 "test_mse_loss": loss,
+                "test_vac_mse_loss": vac_loss,
             },
             on_step=True,
         )

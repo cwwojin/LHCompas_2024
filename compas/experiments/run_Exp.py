@@ -217,7 +217,7 @@ def run_experiment(args: dict):
 
     # Feature Importance Test
     if cfg.PERMUTE_IMPORTANCE:
-        eval_out = {"baseline_mse": test_out[-1]["test_mse_loss_epoch"]}
+        eval_out = {"baseline_mse": test_out[-1]["test_vac_mse_loss_epoch"]}
         for i, feature_name in enumerate(model.x_cols):
             data_module.test.permute_feature(i)
             out = trainer.test(
@@ -227,13 +227,12 @@ def run_experiment(args: dict):
                 ),
                 verbose=False,
             )
-            loss_diff = abs(out[-1]["test_mse_loss_epoch"] - eval_out["baseline_mse"])
+            # loss difference : loss_i - loss_base
+            loss_diff = out[-1]["test_vac_mse_loss_epoch"] - eval_out["baseline_mse"]
             if not feature_name == "vacancy_rate":
                 eval_out[feature_name] = loss_diff
+            data_module.test.revert_permutation()
         eval_out.pop("baseline_mse")
-        importance_sum = sum(list(eval_out.values()))
-        for k, v in eval_out.items():
-            eval_out[k] = v / importance_sum
         eval_out = dict(sorted(eval_out.items(), key=lambda x: x[1], reverse=True))
         out_df = pd.DataFrame.from_dict(
             data=eval_out,

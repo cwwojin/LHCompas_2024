@@ -103,9 +103,16 @@ class DLinearLightningModule(pl.LightningModule):
         loss = self.criterion(y_hat, y)
         self.test_predictions.append((y_hat, y))
 
+        # vacancy-loss
+        vac_loss = self.criterion(
+            y_hat[:, :, :1],
+            y[:, :, :1],
+        )
+
         self.log_dict(
             {
                 "test_mse_loss": loss,
+                "test_vac_mse_loss": vac_loss,
             },
             on_step=True,
         )
