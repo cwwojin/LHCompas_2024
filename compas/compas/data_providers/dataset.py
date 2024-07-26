@@ -123,7 +123,8 @@ class TSMultiDataset(Dataset):
         if not self.shuffled:
             self.data_original = self.data.numpy()
         permute = self.data.numpy()
-        np.random.shuffle(permute[:, :, k])
+        permute[:, :, k] = np.random.randn(permute.shape[0], permute.shape[1])
+        # np.random.shuffle(permute[:, :, k])
         self.data = torch.tensor(permute, dtype=torch.float32)
         self.shuffled = True
 

@@ -52,6 +52,8 @@ class TSSingleDataModule(pl.LightningDataModule):
             self.x_cols = list(df.columns[2:])  # exclude index columns
 
         # Y (vacancy_rate) column must be at the front
+        if "vacancy_rate" not in self.x_cols:
+            self.x_cols = ["vacancy_rate"] + self.x_cols
         if self.x_cols[0] != "vacancy_rate":
             self.x_cols.insert(0, self.x_cols.pop(self.x_cols.index("vacancy_rate")))
 
@@ -142,6 +144,8 @@ class TSMultiDataModule(pl.LightningDataModule):
             self.x_cols = list(self.df_list[0].columns[2:])  # exclude index columns
 
         # Y (vacancy_rate) column must be at the front
+        if "vacancy_rate" not in self.x_cols:
+            self.x_cols = ["vacancy_rate"] + self.x_cols
         if self.x_cols[0] != "vacancy_rate":
             self.x_cols.insert(0, self.x_cols.pop(self.x_cols.index("vacancy_rate")))
 
