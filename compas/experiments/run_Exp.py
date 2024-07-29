@@ -100,7 +100,7 @@ def get_model_name(cfg, timestamp):
     if cfg.MODEL_TYPE == "lstm":
         model_name = f"LSTM_{'bi' if cfg.LSTM.BIDIRECTIONAL else 'uni'}_in_{cfg.INPUT_STEPS}_out_{cfg.OUTPUT_STEPS}_{timestamp}"
     elif cfg.MODEL_TYPE == "gru":
-        model_name = f"GRU_{'bi' if cfg.LSTM.BIDIRECTIONAL else 'uni'}_in_{cfg.INPUT_STEPS}_out_{cfg.OUTPUT_STEPS}_{timestamp}"
+        model_name = f"GRU_{'bi' if cfg.GRU.BIDIRECTIONAL else 'uni'}_in_{cfg.INPUT_STEPS}_out_{cfg.OUTPUT_STEPS}_{timestamp}"
     elif cfg.MODEL_TYPE == "dlinear":
         model_name = f"DLinear_{'indiv' if cfg.DLINEAR.INDIVIDUAL else 'base'}_in_{cfg.INPUT_STEPS}_out_{cfg.OUTPUT_STEPS}_{timestamp}"
     elif cfg.MODEL_TYPE == "cnn":
