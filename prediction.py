@@ -63,9 +63,17 @@ def main():
     for emd_cd in emd_target:
         df_sample = df.loc[df["EMD_CD"] == emd_cd].sort_values(by="STD_YM")
         df_out = model.forecast(df_sample, steps=19)
-        results.append(df_out[["vacancy_rate", "bld_tot_area"]])
+        df_out = df_out[["vacancy_rate", "bld_tot_area"]]
+        df_out["EMD_CD"] = emd_cd
+        results.append(df_out)
+    pd.concat(results, axis=0).reset_index().rename(columns={"index": "STD_YM"}).to_csv(
+        "inference_result_emd.csv",
+        index=False,
+    )
     df_out = (
-        pd.concat(results, axis=0).reset_index().rename(columns={"index": "STD_YM"})
+        pd.concat(results, axis=0)[["vacancy_rate", "bld_tot_area"]]
+        .reset_index()
+        .rename(columns={"index": "STD_YM"})
     )
     df_out["vacancy_rate"] = df_out["vacancy_rate"] * df_out["bld_tot_area"]
     df_out = df_out.groupby("STD_YM").agg("sum")
@@ -79,21 +87,25 @@ def main():
         ],
         axis=1,
     )
-    # result_df.to_csv("./inference_result.csv")
+    result_df = pd.concat(
+        [
+            pd.concat(
+                [
+                    df_sejong.set_index("STD_YM")["vacancy_rate"],
+                    result_df["vac_EMD"],
+                ]
+            ).rename("vacancy_rate"),
+            # pd.concat([df_sejong.set_index('STD_YM')['vacancy_rate'],result_df['vac_Sejong']]).rename('Sejong-total'),
+        ],
+        axis=1,
+    )
+    result_df.reset_index().rename(columns={"index": "STD_YM"}).to_csv(
+        "./inference_result_sejong.csv",
+        index=False,
+    )
 
     fig = px.line(
-        pd.concat(
-            [
-                pd.concat(
-                    [
-                        df_sejong.set_index("STD_YM")["vacancy_rate"],
-                        result_df["vac_EMD"],
-                    ]
-                ).rename("EMD-wise"),
-                # pd.concat([df_sejong.set_index('STD_YM')['vacancy_rate'],result_df['vac_Sejong']]).rename('Sejong-total'),
-            ],
-            axis=1,
-        ),
+        result_df,
         title="Vacancy Rate Prediction",
         labels={"index": "Time", "value": "Vacancy Rate"},
     )
