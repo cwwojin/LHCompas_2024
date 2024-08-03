@@ -90,3 +90,5 @@ venv/
 
 # Extras
 .DS_Store
+.minio_data/
+.mlflow_db/

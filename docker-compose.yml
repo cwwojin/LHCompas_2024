@@ -9,7 +9,6 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.pytorch
-            target: trainer
         image: woojin_trainer
         deploy:
             resources:
@@ -18,7 +17,7 @@ services:
                         - driver: nvidia
                           capabilities: [gpu]
         volumes:
-            - ./data/:/usr/LHCompas_2024/data
+            - .:/usr/LHCompas_2024
         stdin_open: true
         tty: true
         pull_policy: build
@@ -35,7 +34,7 @@ services:
         healthcheck:
             test: ["CMD", "pg_isready", "-q", "-U", "mlflowuser", "-d", "mlflowdatabase"]
             interval: 10s
-            timeout: 5s
+            timeout: 10s
             retries: 5
         volumes:
             - .mlflow_db/:/var/lib/postgresql/data
@@ -53,9 +52,11 @@ services:
         command: server /data/minio --console-address :9001
         healthcheck:
             test: ["CMD", "mc", "ready", "local"]
-            interval: 5s
-            timeout: 5s
+            interval: 10s
+            timeout: 10s
             retries: 5
+        volumes:
+            - .minio_data/:/data
         profiles: ["train-mlflow", "mlflow"]
 
     mlflow-server:
@@ -67,10 +68,11 @@ services:
         depends_on:
             mlflow-backend-store:
                 condition: service_healthy
+                restart: true
             mlflow-artifact-store:
                 condition: service_healthy
         ports:
-            - 5001:5000
+            - 5000:5000
         environment:
             AWS_ACCESS_KEY_ID: minio
             AWS_SECRET_ACCESS_KEY: miniostorage
